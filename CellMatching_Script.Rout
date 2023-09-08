@@ -1,0 +1,371 @@
+
+R version 4.2.3 (2023-03-15) -- "Shortstop Beagle"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls())
+> cat("\f")
+> 
+> pdf("./CellMatching_Plots.pdf",width = 8,height = 5)
+> #### *library*
+> library(monocle3)
+Loading required package: Biobase
+Loading required package: BiocGenerics
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Loading required package: SingleCellExperiment
+Loading required package: SummarizedExperiment
+Loading required package: MatrixGenerics
+Loading required package: matrixStats
+
+Attaching package: ‘matrixStats’
+
+The following objects are masked from ‘package:Biobase’:
+
+    anyMissing, rowMedians
+
+
+Attaching package: ‘MatrixGenerics’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+The following object is masked from ‘package:Biobase’:
+
+    rowMedians
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+
+Attaching package: ‘monocle3’
+
+The following objects are masked from ‘package:Biobase’:
+
+    exprs, fData, fData<-, pData, pData<-
+
+> library(Seurat)
+Attaching SeuratObject
+
+Attaching package: ‘Seurat’
+
+The following object is masked from ‘package:SummarizedExperiment’:
+
+    Assays
+
+> library(SeuratWrappers)
+> library(ggplot2)
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ lubridate 1.9.2     ✔ tibble    3.2.1
+✔ purrr     1.0.1     ✔ tidyr     1.3.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ lubridate::%within%() masks IRanges::%within%()
+✖ dplyr::collapse()     masks IRanges::collapse()
+✖ dplyr::combine()      masks Biobase::combine(), BiocGenerics::combine()
+✖ dplyr::count()        masks matrixStats::count()
+✖ dplyr::desc()         masks IRanges::desc()
+✖ tidyr::expand()       masks S4Vectors::expand()
+✖ dplyr::filter()       masks stats::filter()
+✖ dplyr::first()        masks S4Vectors::first()
+✖ dplyr::lag()          masks stats::lag()
+✖ ggplot2::Position()   masks BiocGenerics::Position(), base::Position()
+✖ purrr::reduce()       masks GenomicRanges::reduce(), IRanges::reduce()
+✖ dplyr::rename()       masks S4Vectors::rename()
+✖ lubridate::second()   masks S4Vectors::second()
+✖ lubridate::second<-() masks S4Vectors::second<-()
+✖ dplyr::slice()        masks IRanges::slice()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(progress)
+> library(cowplot)
+
+Attaching package: ‘cowplot’
+
+The following object is masked from ‘package:lubridate’:
+
+    stamp
+
+> library(tictoc)
+
+Attaching package: ‘tictoc’
+
+The following object is masked from ‘package:SummarizedExperiment’:
+
+    shift
+
+The following object is masked from ‘package:GenomicRanges’:
+
+    shift
+
+The following object is masked from ‘package:IRanges’:
+
+    shift
+
+> library(gridExtra)
+
+Attaching package: ‘gridExtra’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+
+The following object is masked from ‘package:Biobase’:
+
+    combine
+
+The following object is masked from ‘package:BiocGenerics’:
+
+    combine
+
+> 
+> #CURRENT_WORKING_DIR <- dirname(rstudioapi::getActiveDocumentContext()$path)
+> #setwd(CURRENT_WORKING_DIR)
+> getwd()
+[1] "/home/ghlqls/Tenet+/NonMul_final/Bcell"
+> 
+> #################### 1. Make Coembed pseudotime
+> ##### 1) Load Data
+> RNA_Counts <- read.csv("./RNA_Counts.csv",row.names = 1,header = TRUE,check.names = FALSE)
+> ATAC_Counts <- read.csv("./ATAC_Counts.csv",row.names = 1,header = TRUE,check.names = FALSE)
+> UMAP <- read.table("./UMAP.txt")
+> UMAP$orig <- ifelse(rownames(UMAP) %in% rownames(RNA_Counts),"RNA","ATAC")
+> 
+> # Plot1
+> ggplot()+
++   geom_point(data=UMAP,aes(x=UMAP_1,y=UMAP_2,col=orig))+
++   ggtitle("UMAP coordinate")+
++   labs(subtitle = paste0("Total RNA cell number: ",sum(UMAP$orig=="RNA"),"\n",
++                          "Total ATAC cell number: ",sum(UMAP$orig=="ATAC")))+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
+> 
+> UMAP_RNA <- subset(UMAP,orig=="RNA")[,c("UMAP_1","UMAP_2")]
+> UMAP_ATAC <- subset(UMAP,orig=="ATAC")[,c("UMAP_1","UMAP_2")]
+> dim(UMAP_RNA) ; dim(UMAP_ATAC)
+[1] 804   2
+[1] 833   2
+> 
+> UMAP_RNA <- UMAP_RNA[rownames(RNA_Counts),]
+> UMAP_ATAC <- UMAP_ATAC[rownames(ATAC_Counts),]
+> table(rownames(UMAP_RNA) == rownames(RNA_Counts)) ; table(rownames(UMAP_ATAC) == rownames(ATAC_Counts))
+
+TRUE 
+ 804 
+
+TRUE 
+ 833 
+> 
+> #################### 2. Mapping with UMAP distance
+> ##### 1) Calc distance
+> dist_rna <- data.frame(matrix(nrow=nrow(RNA_Counts),ncol=2))
+> colnames(dist_rna) <- c("ATAC_cell_id","dist")
+> rownames(dist_rna) <- rownames(RNA_Counts)
+> 
+> tic("Run time")
+> pb <- progress_bar$new(total = nrow(RNA_Counts))
+> for (j in 1:nrow(RNA_Counts)){
++   RNA_umap_tmp <- UMAP_RNA[j,]
++   dist_tmp <- c()
++   for (k in 1:nrow(ATAC_Counts)){
++     ATAC_umap_tmp <- UMAP_ATAC[k,]
++     dist_tmp <- c(dist_tmp,dist(rbind(RNA_umap_tmp,ATAC_umap_tmp), method = "euclidian"))
++   }
++   idx=which.min(dist_tmp)
++   dist_rna[j,] <- c(rownames(ATAC_Counts)[idx],dist_tmp[idx])
++   pb$tick()
++ }
+> toc()
+Run time: 184.588 sec elapsed
+> dist_rna$dist <- as.numeric(dist_rna$dist)
+> rm(RNA_umap_tmp,ATAC_umap_tmp,dist_tmp,idx,j,k,pb)
+> write.csv(dist_rna,paste0("./CellMatching_results.csv"),row.names = T,quote = F)
+> 
+> ##### 2) Plot
+> RNA_Pseudo <- scan("./RNA_Pseudo.txt")
+Read 804 items
+> order_RNA <- order(RNA_Pseudo)
+> head(RNA_Pseudo[order_RNA])
+[1] 0.000000000 0.003625088 0.014822109 0.023104053 0.027526056 0.027531275
+> head(dist_rna[order_RNA,])
+                             ATAC_cell_id        dist
+TTAAAGGCATTGTCAG-1_1 GCGAAGCCAGGCTAGA-1_2 0.091189691
+AGATGAAGTTTAACCC-1_1 AAAGGCTCAGGACACA-1_2 0.003633568
+TGCATGAGTGCGCATG-1_1 CAGGAAGGTTGCACAA-1_2 0.020899921
+ATGACTCAGGCCTGGT-1_1 CGCTCCATCGATATTG-1_2 0.014119171
+AAAGGAGCACAGAAAC-1_1 CCCAATTGTGGGAACA-1_2 0.025296270
+AAAGGCTCAGGACACA-1_1 CTAATCGCATTGTGCA-1_2 0.014017217
+> 
+> # Plot2
+> ggplot()+
++   geom_point(data=UMAP_RNA,aes(x=UMAP_1,UMAP_2,col=RNA_Pseudo))+
++   scale_color_gradient(low="blue",high="yellow")+
++   ggtitle("Pseudotime of RNA cells")+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
+> 
+> # Plot3
+> ggplot()+
++   geom_point(data=dist_rna[order_RNA,],aes(x=1:nrow(dist_rna),y=dist),alpha=0.5)+
++   xlab("pseudotime")+
++   ggtitle("Distance of each cell")+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
+> 
+> # Plot4
+> cell_rna <- unique(rownames(dist_rna))
+> cell_atac <- unique(dist_rna$ATAC_cell_id)
+> 
+> grid.arrange(ncol=2,
++ ggplot()+
++   geom_point(data=UMAP_RNA,aes(x=UMAP_1,y=UMAP_2,colour="Unselected"))+
++   geom_point(data=UMAP_RNA[which(rownames(UMAP_RNA) %in% cell_rna),],
++              aes(x=UMAP_1,y=UMAP_2,colour="RNA"))+
++   scale_colour_manual("", 
++                       breaks = c("Unselected", "RNA"),
++                       values = c("grey", "light coral")) +
++   ggtitle("RNA")+
++   labs(subtitle = paste0("Selected RNA cell number: ",length(cell_rna)," / ",nrow(RNA_Counts)))+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
++ ,
++ ggplot()+
++   geom_point(data=UMAP_ATAC,aes(x=UMAP_1,y=UMAP_2,colour="Unselected"))+
++   geom_point(data=UMAP_ATAC[which(rownames(UMAP_ATAC) %in% cell_atac),],
++              aes(x=UMAP_1,y=UMAP_2,colour="ATAC"))+
++   scale_colour_manual("", 
++                       breaks = c("Unselected", "ATAC"),
++                       values = c("grey", "steel blue")) +
++   ggtitle("ATAC")+
++   labs(subtitle = paste0("Selected ATAC cell number: ",length(cell_atac)," / ",nrow(ATAC_Counts)))+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
++ )
+> 
+> # Plot5
+> ggplot()+
++   geom_point(data=UMAP,aes(x=UMAP_1,y=UMAP_2,colour="Unselected"))+
++   geom_point(data=UMAP_RNA[which(rownames(UMAP_RNA) %in% cell_rna),],
++              aes(x=UMAP_1,y=UMAP_2,colour="RNA"))+
++   geom_point(data=UMAP_ATAC[which(rownames(UMAP_ATAC) %in% cell_atac),],
++              aes(x=UMAP_1,y=UMAP_2,colour="ATAC"))+
++   scale_colour_manual("", 
++                       breaks = c("Unselected", "RNA", "ATAC"),
++                       values = c("grey", "light coral", "steel blue")) +
++   ggtitle("RNA & ATAC")+
++   theme(plot.title = element_text(hjust = 0.5,size = 20,face = "bold"))
+> dev.off()
+null device 
+          1 
+> 
+> 
+> #################### 4. Make TENET input files
+> ## 1) Merge
+> # RNA
+> MatrixRNA <- RNA_Counts[rownames(dist_rna),]
+> dim(MatrixRNA) ; MatrixRNA[1:3,1:3]
+[1]  804 7939
+                     FHIT LEF1 TSHZ2
+AAAGCAAGTTAACGGC-1_1    0    2     0
+AAAGCCCGTCACAGAC-1_1    9    3     0
+AAAGGAGCACAGAAAC-1_1    0    0     0
+> 
+> # ATAC
+> MatrixATAC <- ATAC_Counts[dist_rna$ATAC_cell_id,]
+> dim(MatrixATAC) ; MatrixATAC[1:3,1:3]
+[1]   804 15968
+                     chr1-234408445-234409794 chr3-125001947-125002926
+CGGTTTCTCAAGCTTA-1_2                        0                        0
+ACACTTGCAGGCTAAG-1_2                        0                        0
+CCCAATTGTGGGAACA-1_2                        0                        0
+                     chr1-213670142-213670885
+CGGTTTCTCAAGCTTA-1_2                        0
+ACACTTGCAGGCTAAG-1_2                        0
+CCCAATTGTGGGAACA-1_2                        0
+> 
+> merged_matrix <- cbind(MatrixRNA,MatrixATAC)
+> dim(merged_matrix) ; merged_matrix[1:3,1:3]
+[1]   804 23907
+                     FHIT LEF1 TSHZ2
+AAAGCAAGTTAACGGC-1_1    0    2     0
+AAAGCCCGTCACAGAC-1_1    9    3     0
+AAAGGAGCACAGAAAC-1_1    0    0     0
+> 
+> table(rowSums(merged_matrix)==0)
+
+FALSE 
+  804 
+> table(colSums(merged_matrix)==0)
+
+FALSE  TRUE 
+23813    94 
+> merged_matrix <- merged_matrix[,colSums(merged_matrix)!=0]
+> table(colSums(merged_matrix)==0) ; dim(merged_matrix)
+
+FALSE 
+23813 
+[1]   804 23813
+> 
+> ### 2) Save Tenet input file
+> write.csv(merged_matrix, file="MergedMatrix.csv",row.names = T,quote = F)
+> write.table(rep(1,nrow(merged_matrix)),file="CellSelect.txt",row.names = F,col.names = F,quote = F)
+> 
+> rm(list=ls())
+> 
+> proc.time()
+   user  system elapsed 
+218.993   5.281 219.399 
