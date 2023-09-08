@@ -7,8 +7,8 @@ $1= RNA_Counts.csv, $2= ATAC_Counts.csv, $3= UMAP.txt, $4= RNA_Pseudo.txt, $5= 1
 ./TENET_NonMul RNA_Counts.csv ATAC_Counts.csv UMAP.txt RNA_Pseudo.txt 16 1 human
 
 ## Example R codes for creating input files (RNA_Counts.csv, ATAC_Counts.csv, UMAP.txt, RNA_Pseudo.txt)
-coembed_sub_RNA <- subset(coembed_sub,from == "RNA")
 
+coembed_sub_RNA <- subset(coembed_sub,from == "RNA")
 coembed_sub_ATAC <- subset(coembed_sub,from == "ATAC")
 
 write.csv(t(as.data.frame(coembed_sub_RNA@assays$RNA@counts)),file="RNA_Counts.csv",row.names = T,quote = F)
